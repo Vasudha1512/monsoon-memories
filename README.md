@@ -72,9 +72,6 @@ As the user chats with Meera:
 * **HTML** – Structure
 * **CSS** – Styling & animations
 * **JavaScript** – Chat logic & interaction
-
-(Optional if used)
-
 * Lightweight audio handling for music
 
 ## 🎯 Goal of the Project
