@@ -1,0 +1,2538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0f1c">
+<title>Monsoon Memories – A Conversation with Meera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════
+   ROOT VARIABLES
+════════════════════════════════════════ */
+:root {
+  --bg-deep:      #060912;
+  --bg-mid:       #0d1528;
+  --bg-card:      rgba(12, 20, 42, 0.72);
+  --rain-blue:    #4a90e2;
+  --rain-light:   #7ab3f0;
+  --warm-amber:   #f0a85a;
+  --warm-glow:    rgba(240, 168, 90, 0.18);
+  --text-main:    #e8edf8;
+  --text-soft:    #8a9bbf;
+  --text-muted:   #4a5878;
+  --meera-bubble: rgba(255,255,255,0.06);
+  --user-bubble:  rgba(74,144,226,0.18);
+  --border:       rgba(255,255,255,0.07);
+  --glass:        rgba(255,255,255,0.04);
+  --f-serif:      'Cormorant Garamond', Georgia, serif;
+  --f-sans:       'DM Sans', system-ui, sans-serif;
+  --ease:         cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ════════════════════════════════════════
+   RESET & BASE
+════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg-deep);
+  color: var(--text-main);
+  font-family: var(--f-sans);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ════════════════════════════════════════
+   RAIN CANVAS
+════════════════════════════════════════ */
+#rain-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+/* ════════════════════════════════════════
+   SCENE BACKGROUND
+════════════════════════════════════════ */
+#scene-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  transition: background 1.8s var(--ease), opacity 1.8s var(--ease);
+  background: radial-gradient(ellipse 80% 60% at 30% 40%, #0d1f3c 0%, #060912 70%);
+}
+#scene-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 40% 40% at 70% 60%, rgba(74,144,226,0.08) 0%, transparent 70%);
+  animation: bg-breathe 6s ease-in-out infinite alternate;
+}
+@keyframes bg-breathe {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+}
+
+/* ════════════════════════════════════════
+   LAYOUT SHELL
+════════════════════════════════════════ */
+#app {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* ════════════════════════════════════════
+   MAIN CARD
+════════════════════════════════════════ */
+#card {
+  display: flex;
+  width: min(960px, 100%);
+  height: min(600px, 94vh);
+  background: var(--bg-card);
+  border: 0.5px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 0 0 0.5px rgba(255,255,255,0.05),
+    0 40px 80px rgba(0,0,0,0.6),
+    0 0 120px rgba(74,144,226,0.06);
+}
+
+/* ════════════════════════════════════════
+   LEFT PANEL — CHARACTER
+════════════════════════════════════════ */
+#left-panel {
+  flex: 0 0 42%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 2rem;
+  border-right: 0.5px solid var(--border);
+}
+
+/* Scene illustration */
+#scene-layer {
+  position: absolute;
+  inset: 0;
+  transition: background 2s var(--ease), opacity 1.5s;
+  background: radial-gradient(ellipse 100% 80% at 50% 100%, #0a1a30 0%, transparent 70%);
+}
+
+/* Ground puddle */
+#puddle {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  height: 60px;
+  background: radial-gradient(ellipse at 50% 80%, rgba(74,144,226,0.18) 0%, transparent 70%);
+  filter: blur(8px);
+  animation: puddle-pulse 4s ease-in-out infinite alternate;
+}
+@keyframes puddle-pulse {
+  from { transform: translateX(-50%) scaleX(0.9); opacity: 0.6; }
+  to   { transform: translateX(-50%) scaleX(1.1); opacity: 1; }
+}
+
+/* Scene elements container */
+#scene-elements {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ── MEERA AVATAR ── */
+#meera-wrap {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+#meera-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  animation: meera-float 5s ease-in-out infinite alternate;
+}
+@keyframes meera-float {
+  from { transform: translateY(0px); }
+  to   { transform: translateY(-10px); }
+}
+
+/* Glow ring around avatar */
+#meera-avatar::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #4a90e2, #7ab3f0, #f0a85a, #4a90e2);
+  opacity: 0.35;
+  animation: ring-spin 8s linear infinite;
+  z-index: -1;
+}
+@keyframes ring-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* SVG avatar illustration */
+#meera-svg {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(145deg, #1a2a4a 0%, #0d1a33 100%);
+  border: 1.5px solid rgba(74,144,226,0.3);
+  box-shadow: 0 0 30px rgba(74,144,226,0.2);
+}
+
+/* Typing indicator */
+#typing-indicator {
+  display: none;
+  gap: 4px;
+  align-items: center;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 99px;
+  border: 0.5px solid var(--border);
+}
+#typing-indicator span {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--rain-blue);
+  animation: dot-bounce 1.1s ease-in-out infinite;
+}
+#typing-indicator span:nth-child(2) { animation-delay: 0.18s; }
+#typing-indicator span:nth-child(3) { animation-delay: 0.36s; }
+@keyframes dot-bounce {
+  0%,80%,100% { transform: translateY(0); opacity: 0.4; }
+  40%         { transform: translateY(-5px); opacity: 1; }
+}
+
+/* Meera name badge */
+#meera-name {
+  font-family: var(--f-serif);
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--text-main);
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+/* Scene text overlay */
+#scene-label {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 1s var(--ease);
+  white-space: nowrap;
+}
+
+/* ════════════════════════════════════════
+   RIGHT PANEL — CHAT
+════════════════════════════════════════ */
+#right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+#chat-header {
+  padding: 1.2rem 1.5rem 1rem;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#chat-header-left h2 {
+  font-family: var(--f-serif);
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+}
+#chat-header-left p {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  letter-spacing: 0.06em;
+}
+#status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+  animation: status-pulse 2s ease-in-out infinite;
+  display: inline-block;
+  margin-right: 6px;
+}
+@keyframes status-pulse {
+  0%,100% { opacity: 1; box-shadow: 0 0 8px #4ade80; }
+  50%     { opacity: 0.5; box-shadow: 0 0 4px #4ade80; }
+}
+
+/* Sound toggle */
+#sound-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 0.5px solid var(--border);
+  background: var(--glass);
+  color: var(--text-soft);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+#sound-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-main);
+  border-color: rgba(255,255,255,0.15);
+}
+#sound-btn svg { width: 16px; height: 16px; }
+
+/* Chat messages area */
+#chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+#chat-messages::-webkit-scrollbar { width: 3px; }
+#chat-messages::-webkit-scrollbar-track { background: transparent; }
+#chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* Message bubbles */
+.msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 88%;
+  animation: msg-appear 0.4s var(--ease-spring) forwards;
+  opacity: 0;
+}
+@keyframes msg-appear {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.msg.meera { align-self: flex-start; }
+.msg.user  { align-self: flex-end; }
+
+.bubble {
+  padding: 10px 14px;
+  border-radius: 16px;
+  line-height: 1.65;
+  font-size: 0.9rem;
+}
+.meera .bubble {
+  background: var(--meera-bubble);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-bottom-left-radius: 4px;
+  color: var(--text-main);
+  backdrop-filter: blur(8px);
+}
+.user .bubble {
+  background: var(--user-bubble);
+  border: 0.5px solid rgba(74,144,226,0.25);
+  border-bottom-right-radius: 4px;
+  color: #c8ddf8;
+}
+
+.msg-time {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+.meera .msg-time { padding-left: 4px; }
+.user  .msg-time { padding-right: 4px; align-self: flex-end; }
+
+/* Italic story text in Meera's bubbles */
+.bubble em {
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-size: 1.05em;
+  color: #c8d8f8;
+}
+
+/* ════════════════════════════════════════
+   RESPONSE OPTIONS
+════════════════════════════════════════ */
+#options-area {
+  padding: 0.8rem 1.4rem 1.2rem;
+  border-top: 0.5px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  transition: opacity 0.3s;
+}
+#options-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+#options-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.opt-btn {
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 99px;
+  color: var(--text-main);
+  font-family: var(--f-sans);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.22s var(--ease);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.opt-btn:hover {
+  background: rgba(74,144,226,0.18);
+  border-color: rgba(74,144,226,0.45);
+  color: #c8ddf8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(74,144,226,0.15);
+}
+.opt-btn:active {
+  transform: translateY(0);
+}
+.opt-btn.selected {
+  background: rgba(74,144,226,0.25);
+  border-color: rgba(74,144,226,0.5);
+  color: #c8ddf8;
+}
+
+/* ════════════════════════════════════════
+   SCENE DECORATION — BOATS
+════════════════════════════════════════ */
+.boat {
+  position: absolute;
+  animation: boat-drift linear infinite;
+  bottom: 28px;
+  opacity: 0;
+  transition: opacity 1s;
+}
+.boat svg { display: block; }
+@keyframes boat-drift {
+  from { transform: translateX(-120px) rotate(-2deg); }
+  50%  { transform: translateX(0px) rotate(2deg); }
+  to   { transform: translateX(120px) rotate(-2deg); }
+}
+
+/* ════════════════════════════════════════
+   SCENE DECORATION — WINDOW
+════════════════════════════════════════ */
+#window-scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.5s var(--ease);
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════
+   MEMORY CARD (story beats)
+════════════════════════════════════════ */
+.memory-card {
+  background: linear-gradient(135deg, rgba(74,144,226,0.08) 0%, rgba(0,0,0,0) 100%);
+  border: 0.5px solid rgba(74,144,226,0.15);
+  border-radius: 12px;
+  padding: 10px 13px;
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: #b8cfee;
+  line-height: 1.7;
+  margin-top: 2px;
+}
+
+/* ════════════════════════════════════════
+   PROGRESS DOTS
+════════════════════════════════════════ */
+#progress {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.prog-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: all 0.3s;
+}
+.prog-dot.active {
+  background: var(--rain-blue);
+  box-shadow: 0 0 6px var(--rain-blue);
+  width: 16px;
+  border-radius: 3px;
+}
+
+/* ════════════════════════════════════════
+   RETURNING USER BANNER
+════════════════════════════════════════ */
+#return-banner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: rgba(74,144,226,0.15);
+  border: 0.5px solid rgba(74,144,226,0.3);
+  backdrop-filter: blur(16px);
+  border-radius: 99px;
+  padding: 8px 20px;
+  font-size: 0.78rem;
+  color: #c8ddf8;
+  z-index: 100;
+  transition: transform 0.6s var(--ease-spring);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+#return-banner.visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ════════════════════════════════════════
+   FULLSCREEN / RESTART
+════════════════════════════════════════ */
+#restart-btn {
+  display: none;
+  padding: 9px 20px;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--border);
+  border-radius: 99px;
+  color: var(--text-soft);
+  font-family: var(--f-sans);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.06em;
+  margin: 0.5rem auto 0;
+}
+#restart-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-main);
+}
+
+/* ════════════════════════════════════════
+   FADE OVERLAY
+════════════════════════════════════════ */
+#scene-fade {
+  position: fixed;
+  inset: 0;
+  background: #060912;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s var(--ease);
+}
+#scene-fade.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ════════════════════════════════════════
+   PARALLAX ELEMENTS
+════════════════════════════════════════ */
+#parallax-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: transform 0.1s linear;
+}
+
+/* Stars / particles */
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: star-twinkle ease-in-out infinite alternate;
+}
+@keyframes star-twinkle {
+  from { opacity: 0.1; }
+  to   { opacity: 0.6; }
+}
+
+/* ════════════════════════════════════════
+   MOBILE RESPONSIVE
+════════════════════════════════════════ */
+@media (max-width: 680px) {
+  #app { padding: 0; align-items: stretch; }
+  #card {
+    flex-direction: column;
+    border-radius: 0;
+    height: 100%;
+    width: 100%;
+  }
+  #left-panel {
+    flex: 0 0 200px;
+    border-right: none;
+    border-bottom: 0.5px solid var(--border);
+    padding-bottom: 1rem;
+  }
+  #meera-avatar { width: 90px; height: 90px; }
+  #meera-svg { width: 90px; height: 90px; }
+  #right-panel { flex: 1; min-height: 0; }
+  #chat-messages { padding: 0.9rem 1rem; }
+  #options-area { padding: 0.6rem 1rem 0.8rem; }
+  .opt-btn { font-size: 0.78rem; padding: 7px 13px; }
+  #chat-header { padding: 0.9rem 1rem 0.7rem; }
+  #scene-label { display: none; }
+}
+
+@media (max-width: 400px) {
+  #left-panel { flex: 0 0 160px; }
+  .bubble { font-size: 0.83rem; }
+}
+
+/* ════════════════════════════════════════
+   SCROLLBAR OVERRIDE
+════════════════════════════════════════ */
+* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+
+/* ════════════════════════════════════════
+   WELCOME / END OVERLAYS
+════════════════════════════════════════ */
+.overlay-screen{
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(74,144,226,0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(240,168,90,0.08) 0%, transparent 70%),
+    #040710;
+  opacity: 1;
+  transition: opacity 1.2s var(--ease), visibility 1.2s;
+  text-align: center;
+}
+.overlay-screen.hidden{
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.overlay-inner{
+  max-width: 560px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 1.2rem;
+  animation: welcome-in 1.4s var(--ease) both;
+}
+@keyframes welcome-in{
+  from{ opacity:0; transform: translateY(20px); filter: blur(6px); }
+  to  { opacity:1; transform: translateY(0);   filter: blur(0); }
+}
+.overlay-kicker{
+  font-size: 0.72rem;
+  color: var(--warm-amber);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.overlay-title{
+  font-family: var(--f-serif);
+  font-weight: 300;
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  color: var(--text-main);
+  background: linear-gradient(180deg, #f6f9ff 0%, #8ab0e8 60%, #4a7ab8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 60px rgba(74,144,226,0.15);
+}
+.overlay-title em{
+  font-style: italic;
+  color: var(--warm-amber);
+  -webkit-text-fill-color: var(--warm-amber);
+}
+.overlay-tagline{
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: var(--text-soft);
+  max-width: 440px;
+}
+.overlay-meta{
+  display: flex; gap: 18px; align-items: center;
+  font-size: 0.7rem; color: var(--text-muted);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  margin-top: 0.3rem;
+}
+.overlay-meta .dot{
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--rain-blue); box-shadow: 0 0 8px var(--rain-blue);
+}
+.overlay-btn{
+  margin-top: 0.8rem;
+  padding: 14px 34px;
+  background: linear-gradient(180deg, rgba(74,144,226,0.25), rgba(74,144,226,0.12));
+  border: 0.5px solid rgba(122,179,240,0.45);
+  border-radius: 99px;
+  color: #eaf2ff;
+  font-family: var(--f-sans);
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  box-shadow:
+    0 0 0 0.5px rgba(255,255,255,0.06),
+    0 10px 40px rgba(74,144,226,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  position: relative;
+  overflow: hidden;
+}
+.overlay-btn::before{
+  content:''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 120%, rgba(240,168,90,0.35), transparent 60%);
+  opacity: 0; transition: opacity 0.4s;
+}
+.overlay-btn:hover{
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 0.5px rgba(255,255,255,0.1),
+    0 16px 50px rgba(74,144,226,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+  border-color: rgba(240,168,90,0.5);
+}
+.overlay-btn:hover::before{ opacity: 1; }
+.overlay-btn-secondary{
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  color: var(--text-soft);
+  box-shadow: none;
+}
+.overlay-btn-secondary:hover{
+  background: rgba(255,255,255,0.06);
+  color: var(--text-main);
+  border-color: rgba(255,255,255,0.2);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+.overlay-actions{
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+  margin-top: 0.4rem;
+}
+
+/* Welcome rain-streak title accent */
+.welcome-sigil{
+  width: 72px; height: 72px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(74,144,226,0.25), rgba(74,144,226,0) 70%);
+  animation: sigil-glow 3.2s ease-in-out infinite alternate;
+  margin-bottom: 0.4rem;
+}
+@keyframes sigil-glow{
+  from{ filter: drop-shadow(0 0 8px rgba(74,144,226,0.3)); }
+  to  { filter: drop-shadow(0 0 22px rgba(240,168,90,0.35)); }
+}
+
+/* Closing constellation */
+.closing-quote{
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-size: 1.25rem;
+  color: #cfe0f7;
+  line-height: 1.7;
+  padding: 1.1rem 1.4rem;
+  border-left: 1px solid rgba(240,168,90,0.4);
+  border-right: 1px solid rgba(74,144,226,0.3);
+  background: linear-gradient(90deg, rgba(240,168,90,0.05), rgba(74,144,226,0.05));
+  border-radius: 4px;
+  max-width: 460px;
+}
+.signature{
+  font-family: var(--f-serif);
+  font-style: italic;
+  color: var(--warm-amber);
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+/* ════════════════════════════════════════
+   ENHANCED LEFT PANEL — SCENERY
+════════════════════════════════════════ */
+#left-panel{
+  background:
+    radial-gradient(circle 90px at 78% 18%, rgba(220,230,255,0.22) 0%, rgba(220,230,255,0.06) 40%, transparent 70%),
+    radial-gradient(ellipse 130% 30% at 50% 78%, rgba(240,168,90,0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 120% 80% at 50% 110%, rgba(74,144,226,0.14) 0%, transparent 60%),
+    linear-gradient(180deg, #050a16 0%, #0a1830 45%, #0c1a32 70%, #050910 100%);
+}
+
+/* The moon */
+#moon{
+  position: absolute;
+  top: 12%; right: 14%;
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f4f0e0 0%, #d8dceb 60%, #8a98b8 100%);
+  box-shadow:
+    0 0 30px rgba(220,230,255,0.35),
+    0 0 80px rgba(122,179,240,0.18),
+    inset -6px -8px 14px rgba(0,0,0,0.25);
+  z-index: 1;
+}
+#moon::after{
+  content:''; position: absolute; inset:-12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 60%);
+  filter: blur(6px);
+  animation: moon-glow 6s ease-in-out infinite alternate;
+}
+@keyframes moon-glow{
+  from{ opacity: 0.5; }
+  to  { opacity: 1; }
+}
+
+/* Drifting clouds across the moon */
+.cloud{
+  position: absolute;
+  height: 22px;
+  background: linear-gradient(180deg, rgba(20,30,55,0.85), rgba(10,18,38,0.6));
+  border-radius: 999px;
+  filter: blur(4px);
+  animation: cloud-drift linear infinite;
+  z-index: 2;
+}
+@keyframes cloud-drift{
+  from{ transform: translateX(-30%); }
+  to  { transform: translateX(130%); }
+}
+
+/* Distant city skyline */
+.skyline{
+  position: absolute;
+  bottom: 70px; left: 0; right: 0;
+  height: 70px;
+  z-index: 2;
+  pointer-events: none;
+}
+.skyline svg{ width: 100%; height: 100%; display: block; }
+
+/* Lit windows in the skyline */
+.window-light{
+  position: absolute;
+  width: 2px; height: 3px;
+  background: #ffd48a;
+  box-shadow: 0 0 6px rgba(240,168,90,0.8);
+  animation: window-flicker 4s ease-in-out infinite;
+  z-index: 3;
+}
+@keyframes window-flicker{
+  0%,100%{ opacity: 0.9; }
+  47%    { opacity: 0.4; }
+  53%    { opacity: 1; }
+}
+
+/* Lightning flash overlay */
+#lightning{
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(200,220,255,0.85) 0%, rgba(122,179,240,0.4) 40%, transparent 80%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  mix-blend-mode: screen;
+}
+@keyframes flash{
+  0%   { opacity: 0; }
+  4%   { opacity: 0.9; }
+  8%   { opacity: 0.1; }
+  12%  { opacity: 0.7; }
+  18%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+#lightning.flash{ animation: flash 5s ease-out; }
+
+/* Local rain streaks falling within left panel */
+.rain-streak{
+  position: absolute;
+  top: -20px;
+  width: 1px;
+  height: 18px;
+  background: linear-gradient(180deg, transparent, rgba(180,210,255,0.55));
+  animation: rain-fall linear infinite;
+  z-index: 3;
+  pointer-events: none;
+}
+@keyframes rain-fall{
+  from{ transform: translateY(-30px); opacity: 0; }
+  10% { opacity: 1; }
+  to  { transform: translateY(700px); opacity: 0.2; }
+}
+
+/* Wet street reflection at the very bottom */
+#wet-street{
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 90px;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(74,144,226,0.10) 35%, rgba(20,40,80,0.45) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+#wet-street::before{
+  content:''; position: absolute;
+  bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 60%; height: 30px;
+  background: radial-gradient(ellipse at 50% 100%, rgba(240,168,90,0.25) 0%, transparent 70%);
+  filter: blur(4px);
+}
+
+/* Window frame around Meera */
+#meera-window{
+  position: relative;
+  z-index: 5;
+  padding: 10px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(122,179,240,0.10), rgba(0,0,0,0.4));
+  box-shadow:
+    inset 0 0 30px rgba(74,144,226,0.20),
+    0 0 0 1px rgba(122,179,240,0.18),
+    0 0 40px rgba(74,144,226,0.18),
+    0 20px 60px rgba(0,0,0,0.5);
+}
+#meera-window::before{
+  content:''; position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid rgba(180,210,255,0.25);
+  background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent 50%);
+  pointer-events: none;
+}
+#meera-window::after{
+  content:''; position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle 1px at 18% 22%, rgba(200,225,255,0.55), transparent 60%),
+    radial-gradient(circle 1.5px at 72% 30%, rgba(200,225,255,0.6), transparent 60%),
+    radial-gradient(circle 1px at 35% 60%, rgba(200,225,255,0.5), transparent 60%),
+    radial-gradient(circle 2px at 84% 70%, rgba(200,225,255,0.55), transparent 60%),
+    radial-gradient(circle 1px at 55% 85%, rgba(200,225,255,0.5), transparent 60%),
+    radial-gradient(circle 1.2px at 12% 78%, rgba(200,225,255,0.5), transparent 60%);
+  opacity: 0.85;
+}
+
+/* Distant hills silhouette */
+.hill{
+  position: absolute; bottom: 0; left: 0; right: 0;
+  pointer-events: none;
+}
+.hill svg{ width: 100%; height: auto; display: block; }
+
+/* Lantern glow — warm accent */
+.lantern{
+  position: absolute;
+  width: 14px; height: 18px;
+  border-radius: 50% 50% 45% 45%;
+  background: radial-gradient(ellipse at 50% 40%, #ffd48a 0%, #f0a85a 40%, rgba(240,168,90,0) 75%);
+  filter: blur(1px);
+  animation: lantern-flicker 2.4s ease-in-out infinite alternate;
+  box-shadow: 0 0 22px rgba(240,168,90,0.6), 0 0 50px rgba(240,168,90,0.3);
+}
+@keyframes lantern-flicker{
+  0%,100%{ opacity: 0.85; transform: scale(1); }
+  40% { opacity: 1; transform: scale(1.06); }
+  60% { opacity: 0.7; transform: scale(0.97); }
+}
+
+/* Ripples on water */
+.ripple{
+  position: absolute;
+  border-radius: 50%;
+  border: 0.5px solid rgba(122,179,240,0.4);
+  animation: ripple-expand 3.5s linear infinite;
+  pointer-events: none;
+}
+@keyframes ripple-expand{
+  0%   { width: 0; height: 0; opacity: 0.7; }
+  100% { width: 60px; height: 14px; opacity: 0; transform: translate(-30px, -7px); }
+}
+
+/* Mist at the bottom */
+.mist{
+  position: absolute;
+  bottom: 0; left: -20%;
+  width: 140%; height: 40%;
+  background: linear-gradient(0deg, rgba(74,144,226,0.12) 0%, transparent 80%);
+  filter: blur(6px);
+  animation: mist-drift 14s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes mist-drift{
+  from{ transform: translateX(-6%); opacity: 0.5; }
+  to  { transform: translateX(6%);  opacity: 0.9; }
+}
+
+/* Firefly (clearing scene) */
+.firefly{
+  position: absolute;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: #ffe9a8;
+  box-shadow: 0 0 8px #ffd48a, 0 0 16px rgba(240,168,90,0.5);
+  animation: firefly-float 8s ease-in-out infinite;
+}
+@keyframes firefly-float{
+  0%,100%{ opacity: 0; transform: translate(0,0); }
+  20%,80%{ opacity: 1; }
+  50%    { transform: translate(30px, -40px); }
+}
+
+/* Avatar upgrade — stronger ring breathing */
+#meera-avatar::after{
+  content:''; position: absolute;
+  inset: -14px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(240,168,90,0.18), transparent 70%);
+  animation: aura-breathe 4s ease-in-out infinite alternate;
+  z-index: -2;
+}
+@keyframes aura-breathe{
+  from{ opacity: 0.4; transform: scale(0.9); }
+  to  { opacity: 0.9; transform: scale(1.1); }
+}
+
+/* Meera subtitle quote */
+#meera-quote{
+  margin-top: 4px;
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+  max-width: 80%;
+  text-align: center;
+  line-height: 1.5;
+  transition: opacity 0.8s;
+}
+
+/* Scene label — upgrade */
+#scene-label{
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: rgba(240,168,90,0.6);
+  letter-spacing: 0.22em;
+}
+
+/* Mobile: overlays still look great */
+@media (max-width: 680px){
+  .overlay-title{ font-size: 2.4rem; }
+  .overlay-tagline{ font-size: 1rem; }
+  .closing-quote{ font-size: 1.05rem; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══ WELCOME / INTRO SCREEN ═══ -->
+<div id="welcome-screen" class="overlay-screen">
+  <canvas id="welcome-rain" style="position:absolute;inset:0;width:100%;height:100%;opacity:0.35;pointer-events:none"></canvas>
+  <div class="overlay-inner">
+    <div class="welcome-sigil">
+      <svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="dropGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#7ab3f0"/>
+            <stop offset="100%" stop-color="#4a90e2"/>
+          </linearGradient>
+        </defs>
+        <path d="M28 6 C28 6 12 26 12 36 A16 16 0 0 0 44 36 C44 26 28 6 28 6 Z"
+              fill="url(#dropGrad)" opacity="0.9"/>
+        <ellipse cx="22" cy="28" rx="3" ry="5" fill="white" opacity="0.35"/>
+      </svg>
+    </div>
+    <div class="overlay-kicker">A quiet weboreel</div>
+    <h1 class="overlay-title">Monsoon <em>Memories</em></h1>
+    <p class="overlay-tagline">
+      Sit by the window for a while.<br>
+      Meera has a few stories to tell — about rain, about home,<br>
+      about the little things we forget to remember.
+    </p>
+    <div class="overlay-meta">
+      <span>5 scenes</span>
+      <span class="dot"></span>
+      <span>~3 minutes</span>
+      <span class="dot"></span>
+      <span>sound optional</span>
+    </div>
+    <button class="overlay-btn" id="begin-btn">Step into the rain →</button>
+  </div>
+</div>
+
+<!-- ═══ END / OUTRO SCREEN ═══ -->
+<div id="end-screen" class="overlay-screen hidden">
+  <div class="overlay-inner">
+    <div class="welcome-sigil" style="animation-duration:5s">
+      <svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="18" fill="none" stroke="#f0a85a" stroke-width="0.5" opacity="0.6"/>
+        <circle cx="28" cy="28" r="10" fill="none" stroke="#7ab3f0" stroke-width="0.5" opacity="0.6"/>
+        <circle cx="28" cy="28" r="3" fill="#f0a85a" opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="overlay-kicker">The story rests</div>
+    <h1 class="overlay-title">Until it <em>rains</em> again</h1>
+    <div class="closing-quote">
+      "Some memories don't fade. They just wait for the rain to come again."
+    </div>
+    <p class="signature">— Meera</p>
+    <div class="overlay-actions">
+      <button class="overlay-btn" id="restart-story-btn">↺ Begin again</button>
+      <button class="overlay-btn overlay-btn-secondary" id="replay-ending-btn">Stay in the scene</button>
+    </div>
+    <div class="overlay-meta" style="margin-top:1rem">
+      <span>Thank you for listening</span>
+    </div>
+  </div>
+</div><!-- /end-screen -->
+
+
+<!-- Rain canvas -->
+<canvas id="rain-canvas"></canvas>
+
+<!-- Scene background -->
+<div id="scene-bg"></div>
+
+<!-- Returning user banner -->
+<div id="return-banner"></div>
+
+<!-- Scene transition fade -->
+<div id="scene-fade"></div>
+
+<!-- App -->
+<div id="app">
+  <div id="card">
+
+    <!-- LEFT: Character Panel -->
+    <div id="left-panel">
+      <div id="parallax-layer"></div>
+      <div id="scene-layer"></div>
+
+      <!-- Night sky elements -->
+      <div id="moon"></div>
+      <div class="cloud" style="top:10%; left:0; width:90px; opacity:0.7; animation-duration:55s;"></div>
+      <div class="cloud" style="top:22%; left:0; width:140px; opacity:0.5; animation-duration:80s; animation-delay:-20s;"></div>
+      <div class="cloud" style="top:6%; left:0; width:70px; opacity:0.6; animation-duration:65s; animation-delay:-40s;"></div>
+
+      <!-- Local rain streaks (dense, layered) -->
+      <div class="rain-streak" style="left:6%;  animation-duration:0.7s; animation-delay:-0.1s"></div>
+      <div class="rain-streak" style="left:11%; animation-duration:0.9s; animation-delay:-0.4s"></div>
+      <div class="rain-streak" style="left:17%; animation-duration:0.6s; animation-delay:-0.2s; opacity:0.7"></div>
+      <div class="rain-streak" style="left:23%; animation-duration:0.8s; animation-delay:-0.6s"></div>
+      <div class="rain-streak" style="left:29%; animation-duration:0.75s; animation-delay:-0.3s"></div>
+      <div class="rain-streak" style="left:36%; animation-duration:1s;   animation-delay:-0.8s; opacity:0.6"></div>
+      <div class="rain-streak" style="left:44%; animation-duration:0.7s; animation-delay:-0.5s"></div>
+      <div class="rain-streak" style="left:51%; animation-duration:0.85s; animation-delay:-0.2s"></div>
+      <div class="rain-streak" style="left:58%; animation-duration:0.6s; animation-delay:-0.7s"></div>
+      <div class="rain-streak" style="left:65%; animation-duration:0.95s; animation-delay:-0.1s; opacity:0.6"></div>
+      <div class="rain-streak" style="left:72%; animation-duration:0.7s; animation-delay:-0.5s"></div>
+      <div class="rain-streak" style="left:80%; animation-duration:0.8s; animation-delay:-0.3s"></div>
+      <div class="rain-streak" style="left:87%; animation-duration:0.65s; animation-delay:-0.9s"></div>
+      <div class="rain-streak" style="left:93%; animation-duration:0.9s; animation-delay:-0.4s; opacity:0.7"></div>
+
+      <!-- Lightning -->
+      <div id="lightning"></div>
+
+      <div id="puddle"></div>
+      <div id="scene-elements"></div>
+      <div id="window-scene"></div>
+
+      <!-- Atmospheric layered scenery -->
+      <div class="mist"></div>
+
+      <!-- Distant city skyline silhouette with lit windows -->
+      <div class="skyline">
+        <svg viewBox="0 0 400 70" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,70 L0,40 L18,40 L18,28 L34,28 L34,46 L52,46 L52,18 L62,18 L62,12 L72,12 L72,18 L82,18 L82,42 L104,42 L104,32 L120,32 L120,50 L138,50 L138,22 L150,22 L150,16 L160,16 L160,22 L172,22 L172,44 L194,44 L194,30 L210,30 L210,48 L228,48 L228,20 L246,20 L246,46 L266,46 L266,34 L284,34 L284,52 L304,52 L304,26 L320,26 L320,44 L340,44 L340,30 L360,30 L360,48 L380,48 L380,38 L400,38 L400,70 Z"
+                fill="#030610" opacity="0.95"/>
+        </svg>
+        <!-- lit windows -->
+        <span class="window-light" style="left:20%; bottom:30px; animation-delay:0.3s"></span>
+        <span class="window-light" style="left:24%; bottom:36px; animation-delay:1.1s"></span>
+        <span class="window-light" style="left:39%; bottom:24px; animation-delay:0.6s"></span>
+        <span class="window-light" style="left:55%; bottom:32px; animation-delay:2.2s"></span>
+        <span class="window-light" style="left:60%; bottom:28px; animation-delay:1.7s"></span>
+        <span class="window-light" style="left:73%; bottom:30px; animation-delay:0.9s"></span>
+        <span class="window-light" style="left:85%; bottom:34px; animation-delay:2.6s"></span>
+      </div>
+
+      <div class="hill" style="opacity:0.35;transform:translateY(10px)">
+        <svg viewBox="0 0 400 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,80 Q60,50 120,62 T240,58 T360,70 T400,60 L400,120 L0,120 Z"
+                fill="#0a1a33" opacity="0.8"/>
+        </svg>
+      </div>
+      <div class="hill" style="opacity:0.55">
+        <svg viewBox="0 0 400 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,60 Q80,30 160,45 T320,42 T400,50 L400,90 L0,90 Z"
+                fill="#060d1c"/>
+        </svg>
+      </div>
+
+      <!-- Wet street reflection -->
+      <div id="wet-street"></div>
+
+      <!-- Warm lanterns in the distance -->
+      <div class="lantern" style="left:14%;bottom:78px;animation-delay:0.2s"></div>
+      <div class="lantern" style="left:78%;bottom:66px;width:10px;height:13px;animation-delay:1.1s"></div>
+      <div class="lantern" style="left:42%;bottom:92px;width:8px;height:11px;animation-delay:0.7s"></div>
+      <div class="lantern" style="left:30%;bottom:60px;width:7px;height:10px;animation-delay:1.6s"></div>
+      <div class="lantern" style="left:88%;bottom:84px;width:9px;height:12px;animation-delay:0.4s"></div>
+
+      <div id="meera-wrap">
+        <div id="meera-window">
+        <div id="meera-avatar">
+          <!-- SVG Meera illustration -->
+          <svg id="meera-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="skinGrad" cx="50%" cy="45%" r="50%">
+                <stop offset="0%" stop-color="#e8b896"/>
+                <stop offset="100%" stop-color="#c8926a"/>
+              </radialGradient>
+              <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#1a2e52"/>
+                <stop offset="100%" stop-color="#0d1a33"/>
+              </radialGradient>
+              <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(74,144,226,0.2)"/>
+                <stop offset="100%" stop-color="rgba(74,144,226,0)"/>
+              </radialGradient>
+              <clipPath id="circle-clip">
+                <circle cx="60" cy="60" r="60"/>
+              </clipPath>
+            </defs>
+            <!-- Background -->
+            <circle cx="60" cy="60" r="60" fill="url(#bgGrad)"/>
+            <circle cx="60" cy="60" r="60" fill="url(#glowGrad)"/>
+            <!-- Rain streaks in bg -->
+            <g opacity="0.2" stroke="#7ab3f0" stroke-width="0.8" stroke-linecap="round">
+              <line x1="20" y1="0" x2="18" y2="30"/>
+              <line x1="35" y1="5" x2="33" y2="25"/>
+              <line x1="85" y1="0" x2="83" y2="22"/>
+              <line x1="100" y1="8" x2="98" y2="35"/>
+              <line x1="10" y1="40" x2="8" y2="60"/>
+              <line x1="110" y1="30" x2="108" y2="55"/>
+            </g>
+            <!-- Body / clothes (kurta) -->
+            <g clip-path="url(#circle-clip)">
+              <!-- Dupatta / shawl -->
+              <ellipse cx="60" cy="115" rx="48" ry="22" fill="#2a4a7a" opacity="0.9"/>
+              <!-- Torso -->
+              <rect x="36" y="80" width="48" height="50" rx="8" fill="#2a4a7a"/>
+              <!-- Kurta pattern dots -->
+              <g fill="#4a70aa" opacity="0.6">
+                <circle cx="50" cy="90" r="1.5"/>
+                <circle cx="60" cy="87" r="1.5"/>
+                <circle cx="70" cy="90" r="1.5"/>
+                <circle cx="55" cy="96" r="1.5"/>
+                <circle cx="65" cy="96" r="1.5"/>
+              </g>
+              <!-- Neck -->
+              <rect x="53" y="72" width="14" height="12" rx="4" fill="url(#skinGrad)"/>
+              <!-- Head -->
+              <ellipse cx="60" cy="58" rx="22" ry="24" fill="url(#skinGrad)"/>
+              <!-- Hair -->
+              <path d="M38 52 Q38 28 60 26 Q82 28 82 52 Q82 42 78 40 Q70 32 60 31 Q50 32 42 40 Q38 42 38 52Z" fill="#1a1008"/>
+              <!-- Hair flow / bun side -->
+              <path d="M38 48 Q32 55 35 68 Q37 58 40 55Z" fill="#1a1008"/>
+              <path d="M82 48 Q88 55 85 68 Q83 58 80 55Z" fill="#1a1008"/>
+              <!-- Bindi -->
+              <circle cx="60" cy="46" r="2" fill="#e85a5a" opacity="0.9"/>
+              <!-- Eyes -->
+              <ellipse cx="51" cy="55" rx="5" ry="4" fill="white"/>
+              <ellipse cx="69" cy="55" rx="5" ry="4" fill="white"/>
+              <circle cx="52" cy="55.5" r="3.2" fill="#3a2010"/>
+              <circle cx="70" cy="55.5" r="3.2" fill="#3a2010"/>
+              <circle cx="53.2" cy="54.2" r="1.2" fill="white" opacity="0.8"/>
+              <circle cx="71.2" cy="54.2" r="1.2" fill="white" opacity="0.8"/>
+              <!-- Eyelashes -->
+              <path d="M46 52 Q48 49 51 51" stroke="#1a1008" stroke-width="1" fill="none"/>
+              <path d="M64 52 Q66 49 72 52" stroke="#1a1008" stroke-width="1" fill="none"/>
+              <!-- Nose -->
+              <ellipse cx="60" cy="62" rx="2.5" ry="1.5" fill="#c8826a" opacity="0.5"/>
+              <!-- Smile -->
+              <path d="M52 69 Q60 75 68 69" stroke="#c8826a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              <!-- Earring -->
+              <circle cx="38.5" cy="59" r="2.5" fill="#f0c860" opacity="0.8"/>
+              <circle cx="81.5" cy="59" r="2.5" fill="#f0c860" opacity="0.8"/>
+              <!-- Raindrop on cheek -->
+              <ellipse cx="44" cy="65" rx="1.5" ry="2" fill="#7ab3f0" opacity="0.5"/>
+            </g>
+          </svg>
+        </div>
+        </div><!-- /meera-window -->
+
+        <div id="typing-indicator">
+          <span></span><span></span><span></span>
+        </div>
+
+        <div id="meera-name">Meera</div>
+        <div id="meera-quote">— storyteller of rainy afternoons —</div>
+      </div>
+
+      <div id="scene-label">— monsoon memories —</div>
+    </div><!-- /left-panel -->
+
+    <!-- RIGHT: Chat Panel -->
+    <div id="right-panel">
+      <div id="chat-header">
+        <div id="chat-header-left">
+          <h2><span id="status-dot"></span>Monsoon Memories</h2>
+          <p id="chat-subtitle">A story with Meera</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="progress">
+            <div class="prog-dot active" id="pd0"></div>
+            <div class="prog-dot" id="pd1"></div>
+            <div class="prog-dot" id="pd2"></div>
+            <div class="prog-dot" id="pd3"></div>
+            <div class="prog-dot" id="pd4"></div>
+          </div>
+          <button id="sound-btn" aria-label="Toggle rain sounds">
+            <svg id="sound-icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            </svg>
+            <svg id="sound-icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <line x1="23" y1="9" x2="17" y2="15"/>
+              <line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="chat-messages"></div>
+
+      <div id="options-area">
+        <div id="options-label">Your response</div>
+        <div id="options-btns"></div>
+        <button id="restart-btn">✨ End</button>
+      </div>
+    </div><!-- /right-panel -->
+
+  </div><!-- /card -->
+</div><!-- /app -->
+
+<audio id="rain-audio" loop preload="none">
+  <!-- Will be generated via Web Audio API -->
+</audio>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   MONSOON MEMORIES — COMPLETE INTERACTIVE ENGINE
+══════════════════════════════════════════════════════════ */
+
+// ── State ──────────────────────────────────────────────
+const State = {
+  soundEnabled: false,
+  audioUnlocked: false,
+  currentStep: 0,
+  userChoice: null,
+  isTyping: false,
+  isReturning: false,
+  rainDrops: [],
+  audioCtx: null,
+  rainGain: null,
+  rainNode: null,
+};
+
+// ── LocalStorage keys ──────────────────────────────────
+const LS_CHOICE = 'mm_user_choice';
+const LS_VISITED = 'mm_visited';
+const LS_SOUND = 'mm_sound';
+
+// ── DOM refs ───────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const msgs       = $('chat-messages');
+const optsBtns   = $('options-btns');
+const optsArea   = $('options-area');
+const typingEl   = $('typing-indicator');
+const sceneBg    = $('scene-bg');
+const sceneLabel = $('scene-label');
+const sceneEl    = $('scene-elements');
+const fadeEl     = $('scene-fade');
+const returnBanner = $('return-banner');
+const restartBtn = $('restart-btn');
+const parallax   = $('parallax-layer');
+
+// ── STORY SCRIPT ───────────────────────────────────────
+/*
+  Each step has:
+    meera: string | string[] (multiple bubbles)
+    options: [{label, next, tag}]  — tag for branching
+    scene: scene config
+    memory: optional italic memory card text
+    progress: dot index
+    onEnter: optional fn
+*/
+
+const STORY = {
+
+  // ── STEP 0: Introduction ───────────────────────────
+  intro: {
+    id: 'intro',
+    progress: 0,
+    scene: { bg: 'dark-rain', label: '' },
+    meeraTyped: true,
+    meera: null, // set dynamically based on returning user
+    options: [
+      { label: '☁️ I love rain',         next: 'loves_rain',      tag: 'love' },
+      { label: '🌤 I enjoy it sometimes', next: 'enjoys_sometimes', tag: 'sometimes' },
+      { label: '☀️ Not really',           next: 'not_really',      tag: 'dislike' },
+    ],
+  },
+
+  // ── STEP 1a: Loves rain ────────────────────────────
+  loves_rain: {
+    id: 'loves_rain',
+    progress: 1,
+    scene: { bg: 'heavy-rain', label: 'the first drops…' },
+    meera: [
+      "I knew it. 💙 You have that look… the one that lights up the moment the sky gets heavy.",
+      "Then let me take you back. Close your eyes for a second.",
+      "Do you remember the first time you ran into the rain… not because you had to. Just because you could?",
+    ],
+    memory: "Running outside, shoes soaked in seconds, laughing at nothing in particular…",
+    options: [
+      { label: '🌧 Yes, I still remember',        next: 'memory_running' },
+      { label: '🌊 Tell me your memory instead',  next: 'memory_running_meera' },
+    ],
+  },
+
+  // ── STEP 1b: Enjoys sometimes ──────────────────────
+  enjoys_sometimes: {
+    id: 'enjoys_sometimes',
+    progress: 1,
+    scene: { bg: 'soft-rain', label: 'some days…' },
+    meera: [
+      "That's honest. Rain has moods too — sometimes it's too heavy, too loud.",
+      "But there are those rare evenings… when it's just a soft drizzle, and everything slows down.",
+      "You've had one of those evenings, I think?",
+    ],
+    memory: "Sitting by a window, watching the world blur softly behind a curtain of rain…",
+    options: [
+      { label: '🪟 That window moment, yes',      next: 'memory_window' },
+      { label: '☕ Tell me about your evenings',   next: 'memory_chai_meera' },
+    ],
+  },
+
+  // ── STEP 1c: Doesn't like rain ─────────────────────
+  not_really: {
+    id: 'not_really',
+    progress: 1,
+    scene: { bg: 'light-rain', label: 'give it a chance…' },
+    meera: [
+      "Ha. Fair enough. Rain can be inconvenient, cold, messy.",
+      "But… maybe nobody showed you the right side of it yet.",
+      "Come. I want to show you something. Just one memory.",
+    ],
+    memory: "The smell of earth after the first monsoon rain — petrichor — nothing quite like it.",
+    options: [
+      { label: '🌿 Okay, one memory', next: 'memory_petrichor' },
+      { label: '🌧 Surprise me',      next: 'memory_boats' },
+    ],
+  },
+
+  // ── MEMORY: Running in rain ────────────────────────
+  memory_running: {
+    id: 'memory_running',
+    progress: 2,
+    scene: { bg: 'running-rain', label: 'the run…' },
+    meera: [
+      "Tell me about it. The puddles? The shouting at the sky?",
+      "I used to run down our lane — arms out, head back, completely soaked in thirty seconds.",
+      "Amma would be at the door, furious and laughing at the same time. 😄",
+    ],
+    memory: "The best runs aren't the ones in races. They're the ones in the rain, for no reason at all.",
+    options: [
+      { label: '⛵ Tell me about paper boats', next: 'memory_boats' },
+      { label: '☕ What about chai evenings?',  next: 'memory_chai' },
+    ],
+  },
+
+  memory_running_meera: {
+    id: 'memory_running_meera',
+    progress: 2,
+    scene: { bg: 'running-rain', label: 'the run…' },
+    meera: [
+      "The first monsoon of the year. The whole street smells different.",
+      "I'd slip my feet out of my chappals at the door and just… run.",
+      "No reason. No destination. Just the rain and the road and the sound of everything being washed clean.",
+    ],
+    memory: "Some things don't need a reason. Running in the rain is one of them.",
+    options: [
+      { label: '⛵ Paper boats next',        next: 'memory_boats' },
+      { label: '☕ Or the chai moments?',    next: 'memory_chai' },
+    ],
+  },
+
+  // ── MEMORY: Window / soft rain ────────────────────
+  memory_window: {
+    id: 'memory_window',
+    progress: 2,
+    scene: { bg: 'window-rain', label: 'at the window…' },
+    meera: [
+      "Those evenings are special, aren't they.",
+      "Rain against glass… the whole world outside becoming watercolour.",
+      "I'd press my forehead against the cold pane and watch the drops race each other down.",
+    ],
+    memory: "Choosing a raindrop and willing it to win. The smallest, most private competition.",
+    options: [
+      { label: '⛵ And the paper boats?',      next: 'memory_boats' },
+      { label: '☕ What about chai moments?',  next: 'memory_chai' },
+    ],
+  },
+
+  // ── MEMORY: Petrichor (not really path) ────────────
+  memory_petrichor: {
+    id: 'memory_petrichor',
+    progress: 2,
+    scene: { bg: 'soft-rain', label: 'the first drop…' },
+    meera: [
+      "You know that smell? When dry earth finally gets rain?",
+      "Petrichor. Scientists have a name for it now, but we knew it long before.",
+      "It smells like relief. Like the world exhaling after holding its breath all summer.",
+    ],
+    memory: "The monsoon's first gift isn't the rain. It's that smell. That exact smell.",
+    options: [
+      { label: '⛵ Show me more memories',    next: 'memory_boats' },
+      { label: '☕ Take me to chai moments',  next: 'memory_chai' },
+    ],
+  },
+
+  // ── MEMORY: Paper Boats ────────────────────────────
+  memory_boats: {
+    id: 'memory_boats',
+    progress: 3,
+    scene: { bg: 'boats', label: 'the little voyages…' },
+    meera: [
+      "Ah. The boats. 🌊",
+      "We'd fold them out of newspaper — sometimes school notebooks — and set them on the water rushing down the street.",
+      "Mine always sank first. My brother's had a secret fold that kept his afloat longest.",
+      "I never figured it out. I still haven't asked him.",
+    ],
+    memory: "A paper boat sailing down a monsoon stream. The whole ocean in a single lane.",
+    options: [
+      { label: '☕ Now tell me about chai',   next: 'memory_chai' },
+      { label: '🌧 Skip to the end',          next: 'final' },
+    ],
+  },
+
+  // ── MEMORY: Chai ──────────────────────────────────
+  memory_chai: {
+    id: 'memory_chai',
+    progress: 3,
+    scene: { bg: 'window-rain', label: 'warm inside…' },
+    meera: [
+      "And then — the best part.",
+      "Coming inside. Dripping everywhere. Everyone pretending to be annoyed.",
+      "Amma would already have tea going. Ginger and cardamom. The whole house smelling of it.",
+      "Pakoras appearing somehow, magically, just as the rain got heavier.",
+    ],
+    memory: "Chai, pakoras, and laughter at the window. The monsoon's real gift was never the rain. It was the excuse to be together.",
+    options: [
+      { label: '🌧 To the ending', next: 'final' },
+    ],
+  },
+
+  memory_chai_meera: {
+    id: 'memory_chai_meera',
+    progress: 3,
+    scene: { bg: 'window-rain', label: 'warm inside…' },
+    meera: [
+      "Those soft rain evenings had a ritual.",
+      "Someone would say — quietly, almost to themselves — 'chai banana chahiye.' We need to make chai.",
+      "And the whole room would come alive. Someone for ginger, someone for gas, someone just standing in the way.",
+    ],
+    memory: "The rain outside. The kitchen alive inside. Tea as an excuse to gather.",
+    options: [
+      { label: '⛵ And the paper boats?',   next: 'memory_boats' },
+      { label: '🌧 Go to the ending',       next: 'final' },
+    ],
+  },
+
+  // ── FINAL ─────────────────────────────────────────
+  final: {
+    id: 'final',
+    progress: 4,
+    scene: { bg: 'clearing', label: '— monsoon memories —' },
+    meera: [
+      "So… that's what I wanted to share with you.",
+      "Rain is never just rain, is it. It's memory. It's feeling. It's home.",
+      "Thank you for sitting with me through this.",
+      "Come back when it rains next. I'll be here. 💙",
+    ],
+    memory: "Some memories don't fade. They just wait for the rain to come again.",
+    options: [],
+    isFinal: true,
+  },
+};
+
+// ── SCENE CONFIGURATIONS ───────────────────────────────
+const SCENES = {
+  'dark-rain': {
+    bg: 'radial-gradient(ellipse 90% 70% at 40% 30%, #0d1f3c 0%, #060912 70%)',
+    accent: 'rgba(74,144,226,0.08)',
+    rainCount: 220, rainSpeed: [4, 9], rainOpacity: [0.12, 0.45],
+    elements: [],
+  },
+  'heavy-rain': {
+    bg: 'radial-gradient(ellipse 100% 80% at 50% 20%, #0a1830 0%, #060810 70%)',
+    accent: 'rgba(74,144,226,0.12)',
+    rainCount: 350, rainSpeed: [8, 16], rainOpacity: [0.2, 0.55],
+    elements: ['running'],
+  },
+  'soft-rain': {
+    bg: 'radial-gradient(ellipse 80% 70% at 30% 50%, #0f2040 0%, #080c18 70%)',
+    accent: 'rgba(74,144,226,0.07)',
+    rainCount: 140, rainSpeed: [3, 6], rainOpacity: [0.08, 0.30],
+    elements: [],
+  },
+  'light-rain': {
+    bg: 'radial-gradient(ellipse 70% 60% at 60% 40%, #121e34 0%, #070a14 70%)',
+    accent: 'rgba(120,170,240,0.06)',
+    rainCount: 100, rainSpeed: [2, 5], rainOpacity: [0.06, 0.22],
+    elements: [],
+  },
+  'running-rain': {
+    bg: 'radial-gradient(ellipse 100% 60% at 50% 80%, #0a1525 0%, #060810 60%)',
+    accent: 'rgba(74,144,226,0.14)',
+    rainCount: 300, rainSpeed: [9, 18], rainOpacity: [0.18, 0.5],
+    elements: ['running'],
+  },
+  'window-rain': {
+    bg: 'radial-gradient(ellipse 60% 80% at 70% 50%, #2a1808 0%, #0d0a14 50%, #060810 100%)',
+    accent: 'rgba(240,168,90,0.12)',
+    rainCount: 180, rainSpeed: [4, 8], rainOpacity: [0.10, 0.38],
+    elements: ['window'],
+  },
+  'boats': {
+    bg: 'radial-gradient(ellipse 90% 60% at 50% 90%, #081525 0%, #030810 65%)',
+    accent: 'rgba(74,144,226,0.1)',
+    rainCount: 200, rainSpeed: [4, 9], rainOpacity: [0.10, 0.40],
+    elements: ['boats'],
+  },
+  'clearing': {
+    bg: 'radial-gradient(ellipse 80% 70% at 50% 40%, #0d1a2e 0%, #080c18 60%)',
+    accent: 'rgba(180,200,240,0.06)',
+    rainCount: 60, rainSpeed: [1.5, 3.5], rainOpacity: [0.05, 0.18],
+    elements: ['stars'],
+  },
+};
+
+// ── RAIN ENGINE ────────────────────────────────────────
+class RainEngine {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.drops = [];
+    this.cfg = SCENES['dark-rain'];
+    this.targetCfg = this.cfg;
+    this.W = 0; this.H = 0;
+    this.lerpT = 1;
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+    this.loop();
+  }
+
+  resize() {
+    const dpr = window.devicePixelRatio || 1;
+    this.W = this.canvas.parentElement?.offsetWidth || window.innerWidth;
+    this.H = this.canvas.parentElement?.offsetHeight || window.innerHeight;
+    // Use actual window for fixed canvas
+    this.W = window.innerWidth;
+    this.H = window.innerHeight;
+    this.canvas.width = this.W * dpr;
+    this.canvas.height = this.H * dpr;
+    this.ctx.scale(dpr, dpr);
+  }
+
+  spawnDrop(cfg) {
+    const [sMin, sMax] = cfg.rainSpeed;
+    const [oMin, oMax] = cfg.rainOpacity;
+    return {
+      x: Math.random() * this.W,
+      y: Math.random() * -this.H * 0.5,
+      len: 10 + Math.random() * 18,
+      speed: sMin + Math.random() * (sMax - sMin),
+      op: oMin + Math.random() * (oMax - oMin),
+      w: 0.6 + Math.random() * 1.2,
+      angle: (15 + Math.random() * 5) * Math.PI / 180,
+    };
+  }
+
+  setScene(sceneKey) {
+    this.targetCfg = SCENES[sceneKey] || SCENES['dark-rain'];
+    this.lerpT = 0;
+  }
+
+  loop() {
+    const cfg = this.targetCfg;
+
+    // Lerp drop count
+    this.lerpT = Math.min(1, this.lerpT + 0.008);
+
+    // Add drops if needed
+    while (this.drops.length < cfg.rainCount) {
+      this.drops.push(this.spawnDrop(cfg));
+    }
+    // Remove excess drops
+    if (this.drops.length > cfg.rainCount + 10) {
+      this.drops.splice(cfg.rainCount);
+    }
+
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.W, this.H);
+
+    for (const d of this.drops) {
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(74,144,226,${d.op * this.lerpT})`;
+      ctx.lineWidth = d.w;
+      ctx.lineCap = 'round';
+      const dx = Math.sin(d.angle) * d.len;
+      const dy = Math.cos(d.angle) * d.len;
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x + dx, d.y + dy);
+      ctx.stroke();
+      d.x += Math.sin(d.angle) * d.speed * 0.35;
+      d.y += d.speed;
+      if (d.y > this.H + 30) {
+        Object.assign(d, this.spawnDrop(cfg));
+        d.y = -20;
+      }
+    }
+    requestAnimationFrame(() => this.loop());
+  }
+}
+
+// ── SCENE MANAGER ──────────────────────────────────────
+class SceneManager {
+  constructor() {
+    this.current = null;
+    this.elements = {};
+    this._buildParallax();
+  }
+
+  _buildParallax() {
+    // Stars
+    for (let i = 0; i < 30; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.cssText = `
+        width:${1 + Math.random()}px; height:${1 + Math.random()}px;
+        top:${Math.random() * 60}%; left:${Math.random() * 100}%;
+        animation-duration:${3 + Math.random() * 5}s;
+        animation-delay:${Math.random() * 5}s;
+        opacity:0;
+      `;
+      parallax.appendChild(s);
+    }
+  }
+
+  transition(sceneKey, callback) {
+    this.current = sceneKey;
+    const cfg = SCENES[sceneKey];
+    if (!cfg) return;
+
+    // Update background
+    sceneBg.style.background = cfg.bg;
+
+    // Scene label
+    const label = STORY[Object.keys(STORY).find(k => STORY[k].scene?.bg === sceneKey)]?.scene?.label || '';
+    if (sceneLabel) {
+      sceneLabel.style.opacity = '0';
+      setTimeout(() => {
+        sceneLabel.textContent = label;
+        sceneLabel.style.opacity = label ? '0.4' : '0';
+      }, 600);
+    }
+
+    // Update scene elements
+    this._updateElements(cfg.elements || []);
+
+    if (callback) setTimeout(callback, 400);
+  }
+
+  _updateElements(elements) {
+    // Clear scene
+    sceneEl.innerHTML = '';
+
+    if (elements.includes('running')) {
+      this._addRunningFigure();
+    }
+    if (elements.includes('boats')) {
+      this._addBoats();
+    }
+    if (elements.includes('window')) {
+      this._addWindowWarmth();
+    }
+    if (elements.includes('stars')) {
+      this._addStars();
+    }
+  }
+
+  _addRunningFigure() {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `
+      position:absolute; bottom:55px; left:50%; transform:translateX(-50%);
+      animation: run-cycle 2s ease-in-out infinite alternate;
+    `;
+
+    // Add keyframe if not exists
+    if (!document.getElementById('run-kf')) {
+      const s = document.createElement('style');
+      s.id = 'run-kf';
+      s.textContent = `
+        @keyframes run-cycle {
+          from { transform: translateX(-40px) rotate(-1deg); filter: blur(0.3px); }
+          to   { transform: translateX(40px) rotate(1deg); filter: blur(1px); }
+        }
+        @keyframes run-bounce {
+          0%,100% { bottom:55px; }
+          50%      { bottom:65px; }
+        }
+      `;
+      document.head.appendChild(s);
+    }
+    wrap.style.animation = 'run-cycle 1.8s ease-in-out infinite alternate, run-bounce 0.9s ease-in-out infinite';
+
+    wrap.innerHTML = `
+      <svg viewBox="0 0 60 90" width="60" height="90" xmlns="http://www.w3.org/2000/svg" opacity="0.55">
+        <circle cx="30" cy="10" r="9" fill="#1e2a40"/>
+        <path d="M22 20 Q30 35 28 55 Q26 65 20 72" stroke="#1e2a40" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <path d="M28 55 Q32 65 40 70" stroke="#1e2a40" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <path d="M25 28 Q14 38 10 48" stroke="#1e2a40" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M28 30 Q38 36 44 42" stroke="#1e2a40" stroke-width="5" fill="none" stroke-linecap="round"/>
+      </svg>
+    `;
+    sceneEl.appendChild(wrap);
+
+    // Splashes
+    for (let i = 0; i < 6; i++) {
+      const splash = document.createElement('div');
+      splash.style.cssText = `
+        position:absolute; bottom:50px; left:${40 + Math.random()*20}%;
+        width:${4+Math.random()*8}px; height:${2+Math.random()*3}px;
+        background:rgba(74,144,226,0.5); border-radius:50%;
+        animation: splash-anim ${0.5+Math.random()*0.4}s ease-out infinite;
+        animation-delay: ${Math.random()*0.5}s;
+      `;
+      sceneEl.appendChild(splash);
+    }
+
+    if (!document.getElementById('splash-kf')) {
+      const s = document.createElement('style');
+      s.id = 'splash-kf';
+      s.textContent = `
+        @keyframes splash-anim {
+          0% { transform: scale(0) translateY(0); opacity:0.8; }
+          60% { transform: scale(1.5) translateY(-8px); opacity:0.5; }
+          100% { transform: scale(2) translateY(-12px); opacity:0; }
+        }
+      `;
+      document.head.appendChild(s);
+    }
+  }
+
+  _addBoats() {
+    const boatSVG = (color, size) => `
+      <svg viewBox="0 0 70 44" width="${size}" height="${size*0.63}" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 30 L65 30 L55 42 L15 42Z" fill="${color}" opacity="0.85"/>
+        <path d="M35 4 L50 30 L20 30Z" fill="${color}" opacity="0.7"/>
+        <line x1="35" y1="6" x2="35" y2="30" stroke="${color}" stroke-width="1" opacity="0.4"/>
+        <line x1="10" y1="36" x2="60" y2="36" stroke="#8a7a60" stroke-width="0.6" opacity="0.3"/>
+      </svg>
+    `;
+
+    const configs = [
+      { y: 35, dur: 16, delay: 0, size: 55, color: '#d8d0b8', dir: 1 },
+      { y: 42, dur: 22, delay: -8, size: 42, color: '#c8c0a8', dir: -1 },
+      { y: 28, dur: 28, delay: -14, size: 48, color: '#e0d8c0', dir: 1 },
+    ];
+
+    // Water shimmer
+    const water = document.createElement('div');
+    water.style.cssText = `
+      position:absolute; bottom:0; left:0; right:0; height:45%;
+      background: linear-gradient(0deg, rgba(10,25,50,0.8) 0%, rgba(10,25,50,0.1) 100%);
+      pointer-events:none;
+    `;
+    sceneEl.appendChild(water);
+
+    configs.forEach(c => {
+      const b = document.createElement('div');
+      b.style.cssText = `
+        position:absolute;
+        bottom:${c.y}px;
+        left:${c.dir > 0 ? '-80px' : 'calc(100% + 80px)'};
+        animation: boat-sail-${c.dir > 0 ? 'r' : 'l'} ${c.dur}s linear infinite;
+        animation-delay: ${c.delay}s;
+      `;
+      b.innerHTML = boatSVG(c.color, c.size);
+      sceneEl.appendChild(b);
+    });
+
+    if (!document.getElementById('boat-kf')) {
+      const s = document.createElement('style');
+      s.id = 'boat-kf';
+      s.textContent = `
+        @keyframes boat-sail-r {
+          from { transform: translateX(0) rotate(-2deg); }
+          50%  { transform: translateX(calc(50vw + 80px)) rotate(2deg); }
+          50.001% { transform: translateX(calc(-100% - 160px)) rotate(-2deg); }
+          to   { transform: translateX(calc(50vw + 80px)) rotate(2deg); }
+        }
+        @keyframes boat-sail-l {
+          from { transform: translateX(0) rotate(2deg); left: calc(100% + 80px); }
+        }
+      `;
+      // Simpler approach
+      s.textContent = `
+        @keyframes boat-sail-r {
+          0%   { left: -90px; }
+          100% { left: calc(100% + 90px); }
+        }
+        @keyframes boat-sail-l {
+          0%   { left: calc(100% + 90px); }
+          100% { left: -90px; }
+        }
+        @keyframes boat-rock {
+          from { transform: rotate(-3deg) translateY(0); }
+          to   { transform: rotate(3deg) translateY(-4px); }
+        }
+      `;
+      document.head.appendChild(s);
+    }
+
+    // Update boats to use left animation + rock
+    sceneEl.querySelectorAll('div[style*="boat"]').forEach((b, i) => {
+      const c = configs[i];
+      b.style.animation = `boat-sail-${c.dir > 0 ? 'r' : 'l'} ${c.dur}s linear ${c.delay}s infinite, boat-rock 2s ease-in-out infinite alternate`;
+    });
+  }
+
+  _addWindowWarmth() {
+    // Warm glow overlay
+    const glow = document.createElement('div');
+    glow.style.cssText = `
+      position:absolute; inset:0;
+      background: radial-gradient(ellipse 70% 60% at 65% 55%, rgba(240,168,90,0.14) 0%, transparent 70%);
+      animation: warm-pulse 4s ease-in-out infinite alternate;
+    `;
+    sceneEl.appendChild(glow);
+
+    // Window frame suggestion
+    const win = document.createElement('div');
+    win.style.cssText = `
+      position:absolute; right:15%; top:15%; width:35%; height:55%;
+      border: 1.5px solid rgba(240,168,90,0.15);
+      border-radius: 4px;
+      background: linear-gradient(135deg, rgba(240,168,90,0.06) 0%, rgba(0,0,0,0) 100%);
+    `;
+    win.innerHTML = `
+      <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(240,168,90,0.12)"></div>
+      <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(240,168,90,0.12)"></div>
+      <!-- Chai steam suggestion -->
+      <div style="position:absolute;bottom:15%;left:50%;transform:translateX(-50%);display:flex;gap:6px">
+        <div style="width:2px;height:18px;background:rgba(255,240,220,0.3);border-radius:99px;animation:steam1 2.2s ease-out infinite"></div>
+        <div style="width:2px;height:22px;background:rgba(255,240,220,0.25);border-radius:99px;animation:steam1 2.2s ease-out 0.7s infinite"></div>
+        <div style="width:2px;height:16px;background:rgba(255,240,220,0.2);border-radius:99px;animation:steam1 2.2s ease-out 1.4s infinite"></div>
+      </div>
+    `;
+    sceneEl.appendChild(win);
+
+    if (!document.getElementById('steam-kf')) {
+      const s = document.createElement('style');
+      s.id = 'steam-kf';
+      s.textContent = `
+        @keyframes steam1 {
+          0% { transform: translateY(0) scaleX(1); opacity:0.4; }
+          100% { transform: translateY(-28px) scaleX(1.4); opacity:0; }
+        }
+        @keyframes warm-pulse {
+          from { opacity:0.7; }
+          to { opacity:1; }
+        }
+      `;
+      document.head.appendChild(s);
+    }
+  }
+
+  _addStars() {
+    for (let i = 0; i < 20; i++) {
+      const s = document.createElement('div');
+      s.style.cssText = `
+        position:absolute;
+        width:${1+Math.random()*2}px; height:${1+Math.random()*2}px;
+        background:white; border-radius:50%;
+        top:${Math.random()*55}%; left:${Math.random()*100}%;
+        animation: star-twinkle ${3+Math.random()*5}s ease-in-out infinite alternate;
+        animation-delay:${Math.random()*4}s;
+        opacity:0;
+        transition: opacity 2s;
+      `;
+      setTimeout(() => s.style.opacity = '0.5', 500 + i * 80);
+      sceneEl.appendChild(s);
+    }
+  }
+}
+
+// ── AUDIO ENGINE ───────────────────────────────────────
+class AudioEngine {
+  constructor() {
+    this.ctx = null;
+    this.masterGain = null;
+    this.rainNode = null;
+    this.rainGain = null;
+    this.enabled = sessionStorage.getItem('mm-sound') !== 'off';
+  }
+
+  unlock() {
+    if (State.audioUnlocked) return;
+    State.audioUnlocked = true;
+    try {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = this.enabled ? 0.5 : 0;
+      this.masterGain.connect(this.ctx.destination);
+      this._startRain();
+    } catch(e) { console.warn('Audio not available'); }
+  }
+
+  _startRain() {
+    if (!this.ctx) return;
+    const bufSize = 4096;
+    const node = this.ctx.createScriptProcessor(bufSize, 1, 1);
+    let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
+    node.onaudioprocess = e => {
+      const out = e.outputBuffer.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) {
+        const w = Math.random() * 2 - 1;
+        b0 = 0.99886*b0 + w*0.0555179;
+        b1 = 0.99332*b1 + w*0.0750759;
+        b2 = 0.96900*b2 + w*0.1538520;
+        b3 = 0.86650*b3 + w*0.3104856;
+        b4 = 0.55000*b4 + w*0.5329522;
+        b5 = -0.7616*b5 - w*0.0168980;
+        out[i] = (b0+b1+b2+b3+b4+b5+b6+w*0.5362) * 0.11;
+        b6 = w * 0.115926;
+      }
+    };
+    this.rainGain = this.ctx.createGain();
+    this.rainGain.gain.value = 0.3;
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 800;
+    filter.Q.value = 0.7;
+    node.connect(filter);
+    filter.connect(this.rainGain);
+    this.rainGain.connect(this.masterGain);
+    this.rainNode = node;
+  }
+
+  setIntensity(val, ms = 800) {
+    if (!this.rainGain || !this.ctx) return;
+    const t = this.ctx.currentTime + ms/1000;
+    this.rainGain.gain.linearRampToValueAtTime(val, t);
+  }
+
+  toggle() {
+    this.enabled = !this.enabled;
+    if (!State.audioUnlocked) this.unlock();
+    if (this.masterGain) {
+      const t = this.ctx.currentTime + 0.3;
+      this.masterGain.gain.linearRampToValueAtTime(this.enabled ? 0.5 : 0, t);
+    }
+    sessionStorage.setItem('mm-sound', this.enabled ? 'on' : 'off');
+    updateSoundBtn(this.enabled);
+  }
+}
+
+// ── CHAT ENGINE ────────────────────────────────────────
+class ChatEngine {
+  constructor() {
+    this.queue = [];
+    this.busy = false;
+  }
+
+  addMeera(text, delay = 0) {
+    this.queue.push({ type: 'meera', text, delay });
+    this._flush();
+  }
+
+  addMemory(text) {
+    this.queue.push({ type: 'memory', text, delay: 0 });
+    this._flush();
+  }
+
+  addUser(text) {
+    return new Promise(resolve => {
+      this.queue.push({ type: 'user', text, delay: 0, resolve });
+      this._flush();
+    });
+  }
+
+  _flush() {
+    if (this.busy || this.queue.length === 0) return;
+    this.busy = true;
+    this._processNext();
+  }
+
+  _processNext() {
+    if (this.queue.length === 0) {
+      this.busy = false;
+      return;
+    }
+    const item = this.queue.shift();
+    setTimeout(() => {
+      if (item.type === 'meera') this._renderMeera(item.text);
+      else if (item.type === 'user') { this._renderUser(item.text); if (item.resolve) item.resolve(); }
+      else if (item.type === 'memory') this._renderMemory(item.text);
+      setTimeout(() => this._processNext(), 200);
+    }, item.delay);
+  }
+
+  _renderMeera(text) {
+    const msg = document.createElement('div');
+    msg.className = 'msg meera';
+    msg.innerHTML = `
+      <div class="bubble">${text}</div>
+      <div class="msg-time">${this._time()}</div>
+    `;
+    msgs.appendChild(msg);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  _renderUser(text) {
+    const msg = document.createElement('div');
+    msg.className = 'msg user';
+    msg.innerHTML = `
+      <div class="bubble">${text}</div>
+      <div class="msg-time">${this._time()}</div>
+    `;
+    msgs.appendChild(msg);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  _renderMemory(text) {
+    const card = document.createElement('div');
+    card.className = 'msg meera';
+    card.style.maxWidth = '96%';
+    card.innerHTML = `<div class="memory-card">${text}</div>`;
+    card.style.animationDelay = '0.1s';
+    msgs.appendChild(card);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  _time() {
+    return new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+  }
+
+  showTyping(ms = 1800) {
+    return new Promise(resolve => {
+      typingEl.style.display = 'flex';
+      $('meera-wrap').appendChild(typingEl);
+      setTimeout(() => {
+        typingEl.style.display = 'none';
+        resolve();
+      }, ms);
+    });
+  }
+
+  clear() {
+    msgs.innerHTML = '';
+    this.queue = [];
+    this.busy = false;
+  }
+}
+
+// ── STORY ENGINE ───────────────────────────────────────
+const rain = new RainEngine($('rain-canvas'));
+const scene = new SceneManager();
+const audio = new AudioEngine();
+const chat = new ChatEngine();
+
+function updateProgress(idx) {
+  document.querySelectorAll('.prog-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
+}
+
+function updateSoundBtn(on) {
+  $('sound-icon-on').style.display = on ? 'block' : 'none';
+  $('sound-icon-off').style.display = on ? 'none' : 'block';
+}
+
+function clearOptions() {
+  optsBtns.innerHTML = '';
+  $('options-label').style.display = 'block';
+  restartBtn.style.display = 'none';
+}
+
+function showOptions(options) {
+  clearOptions();
+  if (!options || options.length === 0) {
+    $('options-label').style.display = 'none';
+    restartBtn.style.display = 'block';
+    return;
+  }
+  options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt.label;
+    btn.style.animationDelay = `${i * 0.08}s`;
+    btn.addEventListener('click', () => handleChoice(opt));
+    optsBtns.appendChild(btn);
+  });
+}
+
+async function handleChoice(opt) {
+  // Lock options
+  optsBtns.querySelectorAll('.opt-btn').forEach(b => {
+    b.disabled = true;
+    b.style.opacity = '0.4';
+  });
+
+  // Add user message
+  await chat.addUser(opt.label);
+
+  // Save choice on first interaction
+  if (State.currentStep === 0 && opt.tag) {
+    localStorage.setItem(LS_CHOICE, opt.tag);
+    State.userChoice = opt.tag;
+  }
+
+  clearOptions();
+
+  // Advance to next step
+  setTimeout(() => playStep(opt.next), 400);
+}
+
+async function playStep(stepId) {
+  const step = STORY[stepId];
+  if (!step) return;
+
+  State.currentStep = stepId;
+  updateProgress(step.progress || 0);
+
+  // Scene transition
+  if (step.scene) {
+    rain.setScene(step.scene.bg);
+    scene.transition(step.scene.bg);
+    // Audio intensity
+    const cfg = SCENES[step.scene.bg];
+    if (cfg) {
+      const intensities = { 60: 0.15, 100: 0.20, 140: 0.25, 180: 0.28, 200: 0.30, 220: 0.32, 300: 0.42, 350: 0.55 };
+      const closest = Object.keys(intensities).reduce((a, b) =>
+        Math.abs(b - cfg.rainCount) < Math.abs(a - cfg.rainCount) ? b : a, 60);
+      audio.setIntensity(intensities[closest] || 0.28);
+    }
+  }
+
+  // Show typing
+  await chat.showTyping(1200 + Math.random() * 600);
+
+  // Render Meera's messages
+  const lines = Array.isArray(step.meera) ? step.meera : [step.meera];
+  for (let i = 0; i < lines.length; i++) {
+    chat.addMeera(lines[i]);
+    if (i < lines.length - 1) {
+      await new Promise(r => setTimeout(r, 800 + lines[i].length * 18));
+      await chat.showTyping(1000 + Math.random() * 500);
+    }
+  }
+
+  // Render memory card
+  if (step.memory) {
+    await new Promise(r => setTimeout(r, 900));
+    chat.addMemory(`<em>${step.memory}</em>`);
+  }
+
+  // Show options
+  await new Promise(r => setTimeout(r, 700));
+  showOptions(step.options);
+
+  // Final step
+  if (step.isFinal) {
+    setTimeout(() => {
+      localStorage.setItem(LS_VISITED, '1');
+    }, 500);
+    rain.setScene('clearing');
+    audio.setIntensity(0.1, 2000);
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────
+async function init() {
+  // Check returning user
+  const prevChoice = localStorage.getItem(LS_CHOICE);
+  const visited    = localStorage.getItem(LS_VISITED);
+  State.isReturning = !!visited;
+  State.userChoice = prevChoice;
+
+  // Show return banner
+  if (State.isReturning && prevChoice) {
+    const labels = { love: 'still chasing the rain?', sometimes: 'back for more grey skies?', dislike: 'warming up to the rain yet?' };
+    returnBanner.textContent = `Hey, you\'re back… ${labels[prevChoice] || 'another rainy day?'}`;
+    setTimeout(() => returnBanner.classList.add('visible'), 1000);
+    setTimeout(() => returnBanner.classList.remove('visible'), 5000);
+  }
+
+  // Set intro message
+  let introMsg;
+  if (State.isReturning && prevChoice === 'love') {
+    introMsg = "You\'re back. 🌧 I had a feeling you\'d return when it started raining. So… still love the rain?";
+  } else if (State.isReturning && prevChoice === 'sometimes') {
+    introMsg = "You came back. That\'s nice. Has the rain been treating you better lately?";
+  } else if (State.isReturning && prevChoice === 'dislike') {
+    introMsg = "Oh, you returned. Even if rain isn\'t your thing, I\'m glad you\'re here. Shall we try again?";
+  } else {
+    introMsg = "Hey… I\'m Meera. Do you like the rain?";
+  }
+  STORY.intro.meera = introMsg;
+
+  // Initial scene
+  rain.setScene('dark-rain');
+  scene.transition('dark-rain');
+
+  // Delay then begin
+  await new Promise(r => setTimeout(r, 800));
+  await chat.showTyping(1600);
+  chat.addMeera(STORY.intro.meera);
+
+  await new Promise(r => setTimeout(r, 600));
+  showOptions(STORY.intro.options);
+}
+
+// ── EVENT LISTENERS ────────────────────────────────────
+$('sound-btn').addEventListener('click', () => {
+  audio.unlock();
+  audio.toggle();
+});
+
+restartBtn.addEventListener('click', () => {
+  // Open the final/end screen directly so the user can see the ending
+  const endScrEl = document.getElementById('end-screen');
+  if (endScrEl) endScrEl.classList.remove('hidden');
+});
+
+// First interaction → unlock audio
+const firstInteract = () => {
+  audio.unlock();
+  document.removeEventListener('click', firstInteract);
+  document.removeEventListener('touchstart', firstInteract);
+};
+document.addEventListener('click', firstInteract);
+document.addEventListener('touchstart', firstInteract);
+
+// Parallax on mouse move
+document.addEventListener('mousemove', e => {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  const dx = (e.clientX - cx) / cx;
+  const dy = (e.clientY - cy) / cy;
+  parallax.style.transform = `translate(${dx * 6}px, ${dy * 4}px)`;
+});
+
+// Update sound button initial state
+updateSoundBtn(audio.enabled);
+
+// ── Occasional lightning flash on the left panel ──
+(function lightningLoop(){
+  const L = document.getElementById('lightning');
+  if(!L) return;
+  function strike(){
+    L.classList.remove('flash');
+    void L.offsetWidth; // restart animation
+    L.classList.add('flash');
+    setTimeout(strike, 9000 + Math.random() * 14000);
+  }
+  setTimeout(strike, 4000 + Math.random() * 6000);
+})();
+
+// ── START ──────────────────────────────────────────────
+// init() is called by the Begin button on the welcome screen — do not auto-start here
+// init();
+
+
+// ══════════════════════════════════════════════════════════
+// WELCOME + END SCREEN ORCHESTRATION
+// ══════════════════════════════════════════════════════════
+(function(){
+  const welcome = document.getElementById('welcome-screen');
+  const endScr  = document.getElementById('end-screen');
+  const beginBtn = document.getElementById('begin-btn');
+  const restartStoryBtn = document.getElementById('restart-story-btn');
+  const replayEndBtn = document.getElementById('replay-ending-btn');
+
+  // Welcome canvas — subtle rain preview
+  const wc = document.getElementById('welcome-rain');
+  if (wc){
+    const wx = wc.getContext('2d');
+    let ww=0, wh=0, drops=[];
+    function resize(){
+      ww = wc.width  = window.innerWidth;
+      wh = wc.height = window.innerHeight;
+      drops = Array.from({length: 180}, () => ({
+        x: Math.random()*ww, y: Math.random()*wh,
+        l: 8+Math.random()*14, s: 3+Math.random()*6,
+        o: 0.1+Math.random()*0.3
+      }));
+    }
+    resize(); window.addEventListener('resize', resize);
+    (function loop(){
+      wx.clearRect(0,0,ww,wh);
+      for (const d of drops){
+        wx.strokeStyle = `rgba(122,179,240,${d.o})`;
+        wx.lineWidth = 0.8;
+        wx.beginPath();
+        wx.moveTo(d.x, d.y);
+        wx.lineTo(d.x+2, d.y+d.l);
+        wx.stroke();
+        d.y += d.s; d.x += 0.6;
+        if (d.y > wh) { d.y = -20; d.x = Math.random()*ww; }
+      }
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  // Begin → fade welcome, start story
+  beginBtn.addEventListener('click', () => {
+    if (typeof audio !== 'undefined') audio.unlock();
+    welcome.classList.add('hidden');
+    setTimeout(() => init(), 600);
+  });
+
+  // Watch for final step → show end screen
+  const origPlayStep = window.playStep;
+  window.playStep = async function(stepId){
+    await origPlayStep(stepId);
+    const step = STORY[stepId];
+    if (step && step.isFinal){
+      setTimeout(() => {
+        endScr.classList.remove('hidden');
+      }, 3500);
+    }
+  };
+
+  // End screen actions
+  restartStoryBtn.addEventListener('click', () => {
+    endScr.classList.add('hidden');
+    localStorage.removeItem(LS_VISITED);
+    localStorage.removeItem(LS_CHOICE);
+    chat.clear();
+    clearOptions();
+    State.currentStep = 0;
+    State.userChoice = null;
+    State.isReturning = false;
+    updateProgress(0);
+    rain.setScene('dark-rain');
+    scene.transition('dark-rain');
+    init();
+  });
+  replayEndBtn.addEventListener('click', () => {
+    endScr.classList.add('hidden');
+  });
+
+  // Dynamic Meera side-quote syncing with story
+  const quoteEl = document.getElementById('meera-quote');
+  const quotesByScene = {
+    'dark-rain':    '— storyteller of rainy afternoons —',
+    'heavy-rain':   '— the sky, in full voice —',
+    'soft-rain':    '— a drizzle, a breath —',
+    'light-rain':   '— give it a moment —',
+    'running-rain': '— barefoot on wet tar —',
+    'window-rain':  '— chai, steam, and glass —',
+    'boats':        '— the little voyages —',
+    'clearing':     '— the sky rests —',
+  };
+  const origTransition = scene.transition.bind(scene);
+  scene.transition = function(key, cb){
+    origTransition(key, cb);
+    if (quoteEl){
+      quoteEl.style.opacity = '0';
+      setTimeout(() => {
+        quoteEl.textContent = quotesByScene[key] || '';
+        quoteEl.style.opacity = '0.75';
+      }, 500);
+    }
+    // Add fireflies in clearing scene
+    if (key === 'clearing'){
+      const container = document.getElementById('scene-elements');
+      for (let i=0;i<6;i++){
+        const f = document.createElement('div');
+        f.className = 'firefly';
+        f.style.left = (10 + Math.random()*80) + '%';
+        f.style.top  = (20 + Math.random()*50) + '%';
+        f.style.animationDelay = (Math.random()*6) + 's';
+        f.style.animationDuration = (6 + Math.random()*5) + 's';
+        container.appendChild(f);
+      }
+    }
+    // Add ripples on boats scene
+    if (key === 'boats'){
+      const container = document.getElementById('scene-elements');
+      for (let i=0;i<5;i++){
+        const r = document.createElement('div');
+        r.className = 'ripple';
+        r.style.left = (15 + Math.random()*70) + '%';
+        r.style.bottom = (5 + Math.random()*30) + 'px';
+        r.style.animationDelay = (Math.random()*3) + 's';
+        container.appendChild(r);
+      }
+    }
+  };
+})();
+
+</script>
+</body>
+</html>
